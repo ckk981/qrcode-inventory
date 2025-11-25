@@ -1,13 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-    --color-brand-50: #f0f9ff;
-    --color-brand-100: #e0f2fe;
-    --color-brand-500: #0ea5e9;
-    --color-brand-600: #0284c7;
-    --color-brand-900: #0c4a6e;
+    /* BSE Mechanical palette */
+    --color-brand-50: #f5f9fd;     /* very light background */
+    --color-brand-100: #e6f0fa;    /* subtle blue tint */
+    --color-brand-500: #2d8fd9;    /* medium brand blue */
+    --color-brand-600: #1277c4;    /* primary buttons */
+    --color-brand-700: #0f5fa0;    /* hover/darker */
+    --color-brand-800: #12365f;    /* header controls */
+    --color-brand-900: #0c2d52;    /* header/navy */
+
+    /* Accent reserved for highlights, not primary buttons */
+    --color-accent-500: #ff7a00;
+
+    /* Typography */
+    --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-display: "Montserrat", var(--font-sans);
 }
 
 body {
     @apply bg-slate-50 text-slate-900 font-sans antialiased;
+}
+
+/* Utility for headings using Montserrat */
+.font-display {
+    font-family: var(--font-display);
 }

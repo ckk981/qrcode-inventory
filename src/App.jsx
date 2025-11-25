@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Scan, PackagePlus, PackageMinus, List, History, User, Shield, LogOut } from 'lucide-react';
+import logoBSE from './assets/logo-bse-horizontal.svg';
 import Scanner from './components/Scanner';
 import InventoryList from './components/InventoryList';
+import BrandFooter from './components/BrandFooter';
+import Badge from './components/Badge';
 
 function App() {
     // --- State Management ---
@@ -14,6 +17,10 @@ function App() {
         const saved = localStorage.getItem('inventory');
         return saved ? JSON.parse(saved) : [];
     });
+
+    // Admin prompt state
+    const [showAdminPrompt, setShowAdminPrompt] = useState(false);
+    const [adminName, setAdminName] = useState('');
 
     // --- Effects ---
     // Persist inventory changes to localStorage whenever the inventory state updates.
@@ -73,6 +80,20 @@ function App() {
         }
     };
 
+    // Validate admin name (case-insensitive)
+    const handleAdminContinue = () => {
+        const normalized = adminName.trim().toLowerCase();
+        const allowed = ['cody eckhardt', 'brian eckhardt'];
+        if (allowed.includes(normalized)) {
+            setUserRole('admin');
+        } else {
+            alert('Not authorized for Admin. Proceeding with Staff Access.');
+            setUserRole('user');
+        }
+        setShowAdminPrompt(false);
+        setAdminName('');
+    };
+
     // --- Render: Role Selection Screen ---
     // If no role is selected, show the login/role chooser.
     if (!userRole) {
@@ -80,29 +101,52 @@ function App() {
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
                 <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
                     <div className="mb-6 flex justify-center">
-                        <div className="bg-brand-100 p-4 rounded-full">
-                            <Scan className="w-12 h-12 text-brand-600" />
-                        </div>
+                        <img src={logoBSE} alt="BSE Mechanical" className="h-10" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900 mb-2">QR Inventory</h1>
                     <p className="text-slate-500 mb-8">Select your access level</p>
-
-                    <div className="space-y-4">
-                        <button
-                            onClick={() => setUserRole('admin')}
-                            className="w-full p-4 bg-brand-600 text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-brand-700 transition shadow-md active:scale-95"
-                        >
-                            <Shield className="w-5 h-5" />
-                            Admin Access
-                        </button>
-                        <button
-                            onClick={() => setUserRole('user')}
-                            className="w-full p-4 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-slate-50 transition active:scale-95"
-                        >
-                            <User className="w-5 h-5" />
-                            Staff Access
-                        </button>
-                    </div>
+                    {showAdminPrompt ? (
+                        <div className="space-y-3">
+                            <input
+                                type="text"
+                                placeholder="Enter your name"
+                                value={adminName}
+                                onChange={(e) => setAdminName(e.target.value)}
+                                className="w-full p-3 bg-white border-2 border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-brand-600"
+                            />
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={handleAdminContinue}
+                                    className="flex-1 p-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition active:scale-95"
+                                >
+                                    Continue as Admin
+                                </button>
+                                <button
+                                    onClick={() => { setShowAdminPrompt(false); setAdminName(''); }}
+                                    className="p-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition active:scale-95"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <button
+                                onClick={() => setShowAdminPrompt(true)}
+                                className="w-full p-4 bg-brand-600 text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-brand-700 transition shadow-md active:scale-95"
+                            >
+                                <Shield className="w-5 h-5" />
+                                Admin Access
+                            </button>
+                            <button
+                                onClick={() => setUserRole('user')}
+                                className="w-full p-4 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-slate-50 transition active:scale-95"
+                            >
+                                <User className="w-5 h-5" />
+                                Staff Access
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -111,10 +155,13 @@ function App() {
     // --- Render: Main Application ---
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Header with Logout */}
+            {/* Header with Logo, Badge, and Logout */}
             <header className="bg-brand-900 text-white p-4 shadow-lg flex justify-between items-center">
-                <h1 className="text-xl font-bold flex items-center gap-2">
-                    <Scan className="w-6 h-6" /> QR Inventory
+                <h1 className="text-xl font-bold flex items-center gap-3">
+                    <img src={logoBSE} alt="BSE Mechanical" className="h-8 rounded" />
+                    <span className="sr-only">BSE Mechanical</span>
+                    <span className="font-display">QR Inventory</span>
+                    <Badge>Internal</Badge>
                 </h1>
                 <button
                     onClick={() => { setUserRole(null); setView('dashboard'); }}
@@ -177,6 +224,7 @@ function App() {
                     </div>
                 )}
             </main>
+            <BrandFooter />
         </div>
     );
 }
